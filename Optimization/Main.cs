@@ -1,6 +1,4 @@
-﻿using Optimization.Properties;
-using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 
