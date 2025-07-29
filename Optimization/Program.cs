@@ -1,55 +1,61 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace Optimization
+class Program
 {
-    static class Program
+    static async Task Main()
     {
-        [STAThread]
-        static async Task Main()
+        string url = "https://raw.githubusercontent.com/creater22/Programma/master/Optimization/Keys.txt";
+
+        string fileContent = await GetContentFromGitHubAsync(url);
+        if (fileContent == null)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            Console.WriteLine("Не удалось получить содержимое файла");
+            return;
+        }
 
-            // Загружаем ключи с GitHub
-            string[] keys = await LoadKeysFromGitHubAsync();
+        string[] keys = fileContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        Console.WriteLine($"Найдено ключей: {keys.Length}");
 
-            // Создаём и показываем форму логина
-            var loginForm = new Login(keys);
-            if (loginForm.ShowDialog() == DialogResult.OK)
+        int validCount = 0;
+        foreach (var key in keys)
+        {
+            if (CheckKey(key))
             {
-                // Получение позиции окна логина
-                var position = loginForm.Location;
-
-                // Запуск основной формы
-                var mainForm = new MainForm(position);
-                Application.Run(mainForm);
+                validCount++;
+                Console.WriteLine($"Ключ прошел проверку: {key}");
             }
             else
             {
-                // Пользователь вышел или закрыл окно
+                Console.WriteLine($"Ключ не прошел проверку: {key}");
             }
         }
 
-        static async Task<string[]> LoadKeysFromGitHubAsync()
+        Console.WriteLine($"Общее количество подходящих ключей: {validCount}");
+    }
+
+    static async Task<string> GetContentFromGitHubAsync(string url)
+    {
+        using (HttpClient client = new HttpClient())
         {
-            string url = "https://raw.githubusercontent.com/creater22/Programma/master/Optimization/Keys.txt"; // исправленный URL
-            using (var client = new System.Net.Http.HttpClient())
+            try
             {
-                try
-                {
-                    var response = await client.GetStringAsync(url);
-                    return response.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка загрузки ключей: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return new string[0];
-                }
+                return await client.GetStringAsync(url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при получении файла: {ex.Message}");
+                return null;
             }
         }
+    }
+
+    static bool CheckKey(string key)
+    {
+        // Ваша логика проверки ключа
+        // Например, попытка расшифровать тестовое сообщение или другая логика
+        return true; // Заглушка
     }
 }
