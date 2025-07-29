@@ -12,7 +12,6 @@ namespace Optimization
         public Login(string[] keys)
         {
             InitializeComponent();
-
             validKeys = keys;
 
             // Назначение обработчика события
@@ -21,28 +20,26 @@ namespace Optimization
 
         private void Login_Button_Click(object sender, EventArgs e)
         {
-            string enteredPassword = Login_textBox.Text.Trim();
+            string enteredKey = Login_textBox.Text.Trim();
 
-            if (IsPasswordCorrect(enteredPassword))
+            if (IsKeyValid(enteredKey))
             {
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
             {
-                var errorForm = new ErrorDialog("Неверный ключ", Color.Red);
-                errorForm.ShowDialog(this);
+                MessageBox.Show("Неверный ключ", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private bool IsPasswordCorrect(string password)
+        private bool IsKeyValid(string key)
         {
             if (validKeys == null || validKeys.Length == 0)
             {
-                // Если ключи не загружены, допускаем любой ненулевой ввод
-                return !string.IsNullOrEmpty(password);
+                return !string.IsNullOrEmpty(key);
             }
-            return validKeys.Any(k => (k?.Trim().Equals(password, StringComparison.OrdinalIgnoreCase)) ?? false);
+            return validKeys.Any(k => string.Equals(k?.Trim(), key, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

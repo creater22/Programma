@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace Optimization
 {
     static class Program
     {
         [STAThread]
-        static void Main()
+        static async Task Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Попытка загрузить ключи из файла
-            string[] keys = LoadKeysFromXml();
+            // Загружаем ключи с GitHub
+            string[] keys = await LoadKeysFromGitHubAsync();
 
             // Создаём и показываем форму логина
             var loginForm = new Login(keys);
@@ -31,33 +31,24 @@ namespace Optimization
             else
             {
                 // Пользователь вышел или закрыл окно
-                // Можно оставить сообщение или ничего не делать
             }
         }
 
-        static string[] LoadKeysFromXml()
+        static async Task<string[]> LoadKeysFromGitHubAsync()
         {
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "keys.xml");
-            if (!File.Exists(filePath))
+            string url = "https://raw.githubusercontent.com/creater22/Programma/master/Optimization/Keys.txt"; // исправленный URL
+            using (var client = new System.Net.Http.HttpClient())
             {
-                // Не показываем сообщение
-                return new string[0];
-            }
-
-            try
-            {
-                var doc = XDocument.Load(filePath);
-                var keys = doc.Descendants("Key")
-                              .Select(k => (string)k.Attribute("value"))
-                              .Where(k => !string.IsNullOrEmpty(k))
-                              .ToArray();
-
-                return keys;
-            }
-            catch
-            {
-                // Ошибки при чтении файла — возвращаем пустой массив
-                return new string[0];
+                try
+                {
+                    var response = await client.GetStringAsync(url);
+                    return response.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки ключей: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return new string[0];
+                }
             }
         }
     }
