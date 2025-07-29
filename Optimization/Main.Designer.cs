@@ -30,7 +30,7 @@
         {
             this.SuspendLayout();
             // 
-            // Main
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
@@ -43,7 +43,8 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
-            this.Name = "Main";
+            this.Name = "MainForm";
+            this.ShowIcon = false;
             this.ResumeLayout(false);
 
         }
