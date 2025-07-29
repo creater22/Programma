@@ -1,61 +1,68 @@
 ﻿using System;
+using System.Drawing;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Linq;
 
-class Program
+namespace Optimization
 {
-    static async Task Main()
+    static class Program
     {
-        string url = "https://raw.githubusercontent.com/creater22/Programma/master/Optimization/Keys.txt";
-
-        string fileContent = await GetContentFromGitHubAsync(url);
-        if (fileContent == null)
+        [STAThread]
+        static void Main()
         {
-            Console.WriteLine("Не удалось получить содержимое файла");
-            return;
+            MainAsync().GetAwaiter().GetResult();
         }
 
-        string[] keys = fileContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        Console.WriteLine($"Найдено ключей: {keys.Length}");
-
-        int validCount = 0;
-        foreach (var key in keys)
+        static async Task MainAsync()
         {
-            if (CheckKey(key))
+            // Получение ключей
+            string url = "https://raw.githubusercontent.com/creater22/Programma/master/Optimization/Keys.txt";
+            string fileContent = await GetContentFromGitHubAsync(url);
+            string[] keys = Array.Empty<string>();
+            if (fileContent != null)
             {
-                validCount++;
-                Console.WriteLine($"Ключ прошел проверку: {key}");
+                keys = fileContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                Console.WriteLine($"Найдено ключей: {keys.Length}");
             }
             else
             {
-                Console.WriteLine($"Ключ не прошел проверку: {key}");
+                MessageBox.Show("Не удалось загрузить ключи", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            // Запуск Windows Forms
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            using (var loginForm = new Login(keys))
+            {
+                if (loginForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Здесь можно открыть основную форму после успешной авторизации
+                    var mainForm = new MainForm(new Point(100, 100));
+                    Application.Run(mainForm);
+                }
+                else
+                {
+                    // Пользователь отменил вход
+                }
             }
         }
 
-        Console.WriteLine($"Общее количество подходящих ключей: {validCount}");
-    }
-
-    static async Task<string> GetContentFromGitHubAsync(string url)
-    {
-        using (HttpClient client = new HttpClient())
+        static async Task<string> GetContentFromGitHubAsync(string url)
         {
-            try
+            using (HttpClient client = new HttpClient())
             {
-                return await client.GetStringAsync(url);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при получении файла: {ex.Message}");
-                return null;
+                try
+                {
+                    return await client.GetStringAsync(url);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при получении файла: {ex.Message}");
+                    return null;
+                }
             }
         }
-    }
-
-    static bool CheckKey(string key)
-    {
-        // Ваша логика проверки ключа
-        // Например, попытка расшифровать тестовое сообщение или другая логика
-        return true; // Заглушка
     }
 }
