@@ -62,14 +62,16 @@ namespace Optimization
                         {
                             writableKey.SetValue(registryValueName, enteredKey);
                         }
-                        MessageBox.Show("Ключ успешно привязан к ПК.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Ключ успешно привязан к ПК.", "Успех");
+                        // Добавляем ключ в список использованных
+                        usedKeysInMemory.Add(enteredKey);
                         this.DialogResult = DialogResult.OK;
                         this.Close();
                         return;
                     }
                     else
                     {
-                        MessageBox.Show("Для входа необходимо привязать ключ.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Для входа необходимо привязать ключ.", "Ошибка");
                         return;
                     }
                 }
@@ -77,16 +79,23 @@ namespace Optimization
                 {
                     if (string.Equals(storedKey, enteredKey, StringComparison.OrdinalIgnoreCase))
                     {
-                        // Добавляем использованный ключ в память
+                        // Проверка, что ключ не использовался
+                        if (usedKeysInMemory.Exists(k => string.Equals(k, enteredKey, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            MessageBox.Show("Этот ключ уже был использован.", "Ошибка");
+                            return;
+                        }
+
+                        // Добавляем в список использованных
                         usedKeysInMemory.Add(enteredKey);
 
-                        MessageBox.Show("Успешный вход!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Успешный вход!", "Успех");
                         this.DialogResult = DialogResult.OK;
                         this.Close();
                     }
                     else
                     {
-                        MessageBox.Show("Неверный ключ.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Неверный ключ.", "Ошибка");
                     }
                 }
             }
