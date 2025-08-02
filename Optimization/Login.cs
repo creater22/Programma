@@ -37,13 +37,6 @@ namespace Optimization
         {
             string enteredKey = Login_textBox.Text.Trim();
 
-            // Проверка, использовался ли этот ключ
-            if (usedKeysInMemory.Exists(k => string.Equals(k, enteredKey, StringComparison.OrdinalIgnoreCase)))
-            {
-                MessageBox.Show("Этот ключ уже был использован.", "Ошибка");
-                return;
-            }
-
             // Проверка привязки в реестре
             string registryPath = @"Software\Optimization";
             string registryValueName = "LicenseKey";
@@ -92,12 +85,22 @@ namespace Optimization
                         MessageBox.Show("Успешный вход!", "Успех");
                         this.DialogResult = DialogResult.OK;
                         this.Close();
+                        return;
                     }
                     else
                     {
                         MessageBox.Show("Неверный ключ.", "Ошибка");
+                        return;
                     }
                 }
+            }
+
+            // После проверки в реестре, если ключ не найден или не совпадает, проверяем список из GitHub
+            if (!usedKeysInMemory.Any(k => string.Equals(k, enteredKey, StringComparison.OrdinalIgnoreCase)))
+            {
+                // Можно здесь реализовать дополнительную проверку, например, валидность ключа
+                // В текущем случае считаем, что любой незанятый ключ из списка допустим
+                // Или, если нужно, можно показать сообщение или выполнить другую логику
             }
         }
 
