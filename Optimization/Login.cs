@@ -45,7 +45,7 @@ namespace Optimization
             }
 
             // Проверка привязки в реестре
-            string registryPath = @"Software\MyApp";
+            string registryPath = @"Software\Optimization";
             string registryValueName = "LicenseKey";
 
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(registryPath))
