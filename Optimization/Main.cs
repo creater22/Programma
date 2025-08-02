@@ -6,62 +6,54 @@ namespace Optimization
 {
     public partial class MainForm : Form
     {
-        private Panel contentPanel;
         private Panel menuPanel;
+        private Panel contentPanel;
         private FlowLayoutPanel layout;
-        private Button btnMouseFix; // Для кнопки внутри вкладки "Latency"
+
+        // Объявляем кнопки
+        private Button btnMain;
+        private Button btnGPU;
+        private Button btnCPU;
+        private Button btnRAM;
+        private Button btnLatency;
+        private Button btnAutorans;
+        private Button btnService;
+        private Button btnTelemetry;
+        private Button btnEnergy;
+        private Button btnExtreme;
+        private Button btnClean;
 
         public MainForm(Point startPosition)
         {
             InitializeComponent();
-
             this.StartPosition = FormStartPosition.Manual;
             this.Location = startPosition;
             this.Size = new Size(900, 600);
 
             // Создаем панели
-            menuPanel = new Panel
-            {
-                BackColor = Color.FromArgb(24, 30, 54),
-                Dock = DockStyle.Left,
-                Width = 200
-            };
+            menuPanel = new Panel();
+            menuPanel.BackColor = Color.FromArgb(24, 30, 54);
+            menuPanel.Dock = DockStyle.Left;
+            menuPanel.Width = 200;
 
-            contentPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.White
-            };
+            contentPanel = new Panel();
+            contentPanel.Dock = DockStyle.Fill;
+            contentPanel.BackColor = Color.White;
 
-            // Создаем основную панель с кнопками
-            layout = new FlowLayoutPanel
-            {
-                FlowDirection = FlowDirection.TopDown,
-                Dock = DockStyle.Fill,
-                Padding = new Padding(0),
-                AutoSize = false,
-                AutoScroll = true,
-                WrapContents = false
-            };
+            // Создаем кнопки с новыми названиями
+            btnMain = CreateButton("Главная");
+            btnGPU = CreateButton("GPU");
+            btnCPU = CreateButton("CPU");
+            btnRAM = CreateButton("RAM");
+            btnLatency = CreateButton("Latency");
+            btnAutorans = CreateButton("Autorans");
+            btnService = CreateButton("Service");
+            btnTelemetry = CreateButton("Telemetry");
+            btnEnergy = CreateButton("Energy");
+            btnExtreme = CreateButton("Extreme");
+            btnClean = CreateButton("Clean");
 
-            // Создаем кнопки
-            var btnMain = CreateButton("Главная");
-            var btnGPU = CreateButton("GPU");
-            var btnCPU = CreateButton("CPU");
-            var btnRAM = CreateButton("RAM");
-            var btnLatency = CreateButton("Latency");
-            var btnAutorans = CreateButton("Autorans");
-            var btnService = CreateButton("Service");
-            var btnTelemetry = CreateButton("Telemetry");
-            var btnEnergy = CreateButton("Energy");
-            var btnExtreme = CreateButton("Extreme");
-            var btnClean = CreateButton("Clean");
-
-            // Создаем кнопку для MouseFix, которая внутри вкладки "Latency"
-            btnMouseFix = CreateButton("MouseFix");
-            btnMouseFix.Click += (s, e) => ShowMouseFixControl();
-
-            // Назначаем обработчики для других кнопок
+            // Назначаем обработчики
             btnMain.Click += (s, e) => ActivateButton(btnMain);
             btnGPU.Click += (s, e) => ActivateButton(btnGPU);
             btnCPU.Click += (s, e) => ActivateButton(btnCPU);
@@ -74,41 +66,34 @@ namespace Optimization
             btnExtreme.Click += (s, e) => ActivateButton(btnExtreme);
             btnClean.Click += (s, e) => ActivateButton(btnClean);
 
-            // Создаем вкладку "Latency"
-            var tabControl = new TabControl
+            // Создаем FlowLayoutPanel для вертикального списка с прокруткой
+            layout = new FlowLayoutPanel();
+            layout.FlowDirection = FlowDirection.TopDown;
+            layout.Dock = DockStyle.Fill;
+            layout.Padding = new Padding(0);
+            layout.AutoSize = false;
+            layout.AutoScroll = true; // включена вертикальная прокрутка
+            layout.WrapContents = false; // отключить перенос элементов по строкам
+
+            // Добавляем кнопки
+            layout.Controls.AddRange(new Control[]
             {
-                Dock = DockStyle.Left,
-                Width = 200
-            };
+                btnMain, btnGPU, btnCPU, btnRAM, btnLatency, btnAutorans, btnService, btnTelemetry, btnEnergy, btnExtreme, btnClean
+            });
 
-            var tabLatency = new TabPage("Latency");
-            var latencyPanel = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Top,
-                AutoSize = true,
-                FlowDirection = FlowDirection.LeftToRight
-            };
-            latencyPanel.Controls.Add(btnMouseFix); // добавляем кнопку внутрь вкладки
-
-            tabLatency.Controls.Add(latencyPanel);
-            tabControl.TabPages.Add(tabLatency);
-
-            // Создаем другие вкладки, например "Main"
-            var tabMain = new TabPage("Main");
-            var lblMain = new Label
-            {
-                Text = "Основное содержимое",
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-            tabMain.Controls.Add(lblMain);
-            tabControl.TabPages.Add(tabMain);
-
-            // Добавляем всё на форму
+            // Добавляем панели на форму
             this.Controls.Add(contentPanel);
             this.Controls.Add(menuPanel);
-            this.Controls.Add(tabControl);
             menuPanel.Controls.Add(layout);
+
+            // Обновляем ширину кнопок при изменении размера формы
+            this.SizeChanged += (s, e) =>
+            {
+                foreach (Control ctrl in layout.Controls)
+                {
+                    ctrl.Width = layout.ClientSize.Width;
+                }
+            };
 
             // Активируем первую кнопку
             ActivateButton(btnMain);
@@ -116,20 +101,19 @@ namespace Optimization
 
         private Button CreateButton(string text)
         {
-            var btn = new Button
-            {
-                Text = text,
-                Height = 50,
-                Width = 200,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(24, 30, 54),
-                Margin = new Padding(0, 2, 0, 2),
-                Padding = new Padding(10, 0, 0, 0),
-                FlatAppearance = { BorderSize = 0 }
-            };
+            var btn = new Button();
+            btn.Text = text;
+            btn.Height = 50;
+            btn.Width = 200; // изначально, будет скорректировано при resize
+            btn.TextAlign = ContentAlignment.MiddleLeft;
+            btn.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.ForeColor = Color.White;
+            btn.BackColor = Color.FromArgb(24, 30, 54);
+            // Уменьшено расстояние между вкладками
+            btn.Margin = new Padding(0, 2, 0, 2); // уменьшено межкнопочное пространство
+            btn.Padding = new Padding(10, 0, 0, 0);
+            btn.FlatAppearance.BorderSize = 0;
             return btn;
         }
 
@@ -145,14 +129,14 @@ namespace Optimization
             }
             // Выделяем активную
             btn.BackColor = Color.FromArgb(37, 46, 94);
-            // Показываем содержимое (по названию)
+            // Обновляем содержимое
             ShowContent(btn.Text);
         }
 
         private void ShowContent(string title)
         {
             contentPanel.Controls.Clear();
-            Label lbl = new Label
+            Label lbl = new Label()
             {
                 Text = $"Это содержимое для: {title}",
                 Dock = DockStyle.Fill,
@@ -160,14 +144,6 @@ namespace Optimization
                 Font = new Font("Segoe UI", 14),
             };
             contentPanel.Controls.Add(lbl);
-        }
-
-        private void ShowMouseFixControl()
-        {
-            contentPanel.Controls.Clear();
-            var mouseFixControl = new MouseFixControl();
-            mouseFixControl.Dock = DockStyle.Fill;
-            contentPanel.Controls.Add(mouseFixControl);
         }
     }
 }
